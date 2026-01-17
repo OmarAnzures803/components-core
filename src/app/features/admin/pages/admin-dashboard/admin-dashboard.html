@@ -1,0 +1,244 @@
+<h1 class="text-2xl font-bold mb-4">Panel de administración - Productos</h1>
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+  <div class="flex gap-2">
+    <button mat-stroked-button routerLink="/admin">
+      Productos
+    </button>
+    <button mat-raised-button color="primary" routerLink="/admin/categories">
+      Ir a categorías
+    </button>
+     <button mat-stroked-button routerLink="/admin/orders">
+      Pedidos
+    </button>
+  </div>
+
+  <div class="flex flex-col md:flex-row gap-2 md:items-center">
+    <mat-form-field appearance="outline" class="w-full md:w-64">
+      <mat-label>Buscar</mat-label>
+      <input
+        matInput
+        placeholder="Nombre o marca"
+        [ngModel]="searchTerm"
+        (ngModelChange)="onSearchChange($event)"
+      />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full md:w-64">
+      <mat-label>Filtrar por categoría</mat-label>
+      <mat-select
+        [ngModel]="filterCategoryId ?? 'all'"
+        (ngModelChange)="onFilterCategoryChange($event)"
+      >
+        <mat-option value="all">Todas</mat-option>
+        @for (c of categories; track c.id) {
+          <mat-option [value]="c.id">
+            {{ c.name }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+</div>
+<div class="grid gap-6 md:grid-cols-2">
+  <!-- LISTA DE PRODUCTOS -->
+  <section>
+    <h2 class="text-xl font-semibold mb-2">Listado de productos</h2>
+
+    @if (loadingProducts) {
+      <p class="text-gray-500">Cargando productos...</p>
+    } @else if (errorProducts) {
+      <p class="text-red-600">{{ errorProducts }}</p>
+    } @else {
+      @if (products.length === 0) {
+        <p class="text-gray-500">No hay productos registrados.</p>
+      } @else {
+        <div class="overflow-auto border rounded-lg">
+          <table class="min-w-full text-sm">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="px-3 py-2 text-left">Nombre</th>
+                <th class="px-3 py-2 text-left">Marca</th>
+                <th class="px-3 py-2 text-right">Precio</th>
+                <th class="px-3 py-2 text-right">Stock</th>
+                <th class="px-3 py-2 text-left">Categoría</th>
+                <th class="px-3 py-2 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of products; track p.id) {
+                <tr class="border-t">
+                  <td class="px-3 py-2">{{ p.name }}</td>
+                  <td class="px-3 py-2">{{ p.brand }}</td>
+                  <td class="px-3 py-2 text-right">
+                    $ {{ p.price }}
+                  </td>
+                  <td class="px-3 py-2 text-right">
+                    {{ p.stock }}
+                  </td>
+                  <td class="px-3 py-2">
+                    {{ getCategoryName(p.categoryId) }}
+                  </td>
+                  <td class="px-3 py-2 text-right space-x-2">
+                    <button
+                      mat-button
+                      color="primary"
+                      (click)="startEdit(p)"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      mat-button
+                      color="warn"
+                      (click)="deleteProduct(p)"
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-3 flex items-center justify-between text-sm">
+  <span>
+    Mostrando
+    {{ products.length }}
+    de
+    {{ totalProducts }}
+    productos
+  </span>
+
+  <div class="flex gap-2">
+    <button
+      mat-stroked-button
+      [disabled]="page <= 1"
+      (click)="goToPage(-1)"
+    >
+      Anterior
+    </button>
+
+    <span>
+      Página {{ page }} de {{ maxPage }}
+    </span>
+
+    <button
+      mat-stroked-button
+      [disabled]="page >= maxPage"
+      (click)="goToPage(1)"
+    >
+      Siguiente
+    </button>
+  </div>
+</div>
+
+      }
+    }
+  </section>
+
+  <!-- FORMULARIO CREAR/EDITAR -->
+  <section>
+    <h2 class="text-xl font-semibold mb-2">
+      {{ isEditing ? 'Editar producto' : 'Nuevo producto' }}
+    </h2>
+
+    <button mat-stroked-button class="mb-3" (click)="startCreate()">
+      Limpiar formulario
+    </button>
+
+    <form (ngSubmit)="saveProduct()" class="flex flex-col gap-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input
+          matInput
+          name="name"
+          [(ngModel)]="form.name"
+          required
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Marca</mat-label>
+        <input
+          matInput
+          name="brand"
+          [(ngModel)]="form.brand"
+          required
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Descripción</mat-label>
+        <textarea
+          matInput
+          name="description"
+          rows="3"
+          [(ngModel)]="form.description"
+        ></textarea>
+      </mat-form-field>
+
+      <div class="grid gap-3 md:grid-cols-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Precio</mat-label>
+          <input
+            matInput
+            type="number"
+            name="price"
+            [(ngModel)]="form.price"
+            required
+            min="0"
+            step="0.01"
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Stock</mat-label>
+          <input
+            matInput
+            type="number"
+            name="stock"
+            [(ngModel)]="form.stock"
+            required
+            min="0"
+          />
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Categoría</mat-label>
+        <mat-select
+          name="categoryId"
+          [(ngModel)]="form.categoryId"
+        >
+          <mat-option [value]="null">Sin categoría</mat-option>
+          @for (c of categories; track c.id) {
+            <mat-option [value]="c.id">
+              {{ c.name }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>URL de imagen</mat-label>
+        <input
+          matInput
+          name="imageUrl"
+          [(ngModel)]="form.imageUrl"
+        />
+      </mat-form-field>
+
+      @if (errorSave) {
+        <p class="text-red-600">{{ errorSave }}</p>
+      }
+
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="loadingSave"
+      >
+        {{ loadingSave ? 'Guardando...' : (isEditing ? 'Actualizar' : 'Crear') }}
+      </button>
+    </form>
+  </section>
+</div>

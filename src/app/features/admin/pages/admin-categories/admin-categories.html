@@ -1,0 +1,108 @@
+<h1 class="text-2xl font-bold mb-4">Administrar categorías</h1>
+
+<div class="grid gap-6 md:grid-cols-2">
+  <!-- LISTA -->
+  <section>
+    <h2 class="text-xl font-semibold mb-2">Listado de categorías</h2>
+
+    @if (loading) {
+      <p class="text-gray-500">Cargando categorías...</p>
+    } @else if (error) {
+      <p class="text-red-600">{{ error }}</p>
+    } @else {
+      @if (categories.length === 0) {
+        <p class="text-gray-500">No hay categorías registradas.</p>
+      } @else {
+        <div class="overflow-auto border rounded-lg">
+          <table class="min-w-full text-sm">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="px-3 py-2 text-left">Nombre</th>
+                <th class="px-3 py-2 text-left">Descripción</th>
+                <th class="px-3 py-2 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of categories; track c.id) {
+                <tr class="border-t">
+                  <td class="px-3 py-2">{{ c.name }}</td>
+                  <td class="px-3 py-2">
+                    {{ c.description || '-' }}
+                  </td>
+                  <td class="px-3 py-2 text-right space-x-2">
+                    <button
+                      mat-button
+                      color="primary"
+                      (click)="startEdit(c)"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      mat-button
+                      color="warn"
+                      (click)="deleteCategory(c)"
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </section>
+
+  <!-- FORMULARIO -->
+  <section>
+    <h2 class="text-xl font-semibold mb-2">
+      {{ isEditing ? 'Editar categoría' : 'Nueva categoría' }}
+    </h2>
+
+    <button mat-stroked-button class="mb-3" (click)="startCreate()">
+      Limpiar formulario
+    </button>
+
+    <form (ngSubmit)="saveCategory()" class="flex flex-col gap-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input
+          matInput
+          name="name"
+          [(ngModel)]="form.name"
+          required
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Descripción</mat-label>
+        <textarea
+          matInput
+          name="description"
+          rows="3"
+          [(ngModel)]="form.description"
+        ></textarea>
+      </mat-form-field>
+
+      @if (errorSave) {
+        <p class="text-red-600">{{ errorSave }}</p>
+      }
+
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="loadingSave"
+      >
+        {{
+          loadingSave
+            ? 'Guardando...'
+            : isEditing
+              ? 'Actualizar'
+              : 'Crear'
+        }}
+      </button>
+    </form>
+  </section>
+</div>

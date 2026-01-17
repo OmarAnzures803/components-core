@@ -1,0 +1,92 @@
+<h1 class="text-2xl font-bold mb-4">Carrito de compras</h1>
+
+@if (items.length === 0) {
+  <p class="mb-4 text-gray-600">
+    Tu carrito está vacío.
+  </p>
+
+  <button mat-raised-button color="primary" (click)="goToProducts()">
+    Ir a productos
+  </button>
+} @else {
+  <div class="overflow-auto border rounded-lg mb-4">
+    <table class="min-w-full text-sm">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-3 py-2 text-left">Producto</th>
+          <th class="px-3 py-2 text-left">Marca</th>
+          <th class="px-3 py-2 text-right">Precio</th>
+          <th class="px-3 py-2 text-right">Cantidad</th>
+          <th class="px-3 py-2 text-right">Subtotal</th>
+          <th class="px-3 py-2 text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of items; track item.product.id) {
+          <tr class="border-t">
+            <td class="px-3 py-2">{{ item.product.name }}</td>
+            <td class="px-3 py-2">{{ item.product.brand }}</td>
+            <td class="px-3 py-2 text-right">
+                {{ item.product.price | number: '1.2-2' }}
+            </td>
+
+            <td class="px-3 py-2 text-right">
+              <input
+                type="number"
+                min="1"
+                class="border rounded px-2 py-1 w-20 text-right"
+                [ngModel]="item.quantity"
+                (ngModelChange)="onQuantityChange(item, $event)"
+              />
+            </td>
+            <td class="px-3 py-2 text-right">
+                {{ (item.product.price * item.quantity) | number: '1.2-2' }}
+            </td>
+
+            <td class="px-3 py-2 text-right">
+              <button
+                mat-button
+                color="warn"
+                (click)="removeItem(item)"
+              >
+                Quitar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+    <div>
+      <button mat-stroked-button (click)="clearCart()">
+        Vaciar carrito
+      </button>
+    </div>
+
+    <div class="text-right">
+      <p class="text-lg font-semibold mb-2">
+        Total:
+        {{ totalAmount | number : '1.2-2' }}
+      </p>
+
+      @if (errorCheckout) {
+        <p class="text-red-600 mb-2">{{ errorCheckout }}</p>
+      }
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="checkout()"
+        [disabled]="loadingCheckout"
+      >
+        {{ loadingCheckout ? 'Procesando...' : 'Realizar pedido' }}
+      </button>
+    </div>
+  </div>
+
+  <button mat-button (click)="goToProducts()">
+    Seguir comprando
+  </button>
+}

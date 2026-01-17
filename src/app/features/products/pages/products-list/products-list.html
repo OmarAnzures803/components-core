@@ -1,0 +1,82 @@
+<h1 class="text-2xl font-bold mb-4">Componentes de PC</h1>
+
+<!-- Filtros -->
+<div class="mb-6 flex flex-col gap-4 md:flex-row md:items-center">
+  <!-- Select de categoría -->
+  <mat-form-field appearance="outline" class="w-full md:w-64">
+    <mat-label>Categoría</mat-label>
+    <mat-select
+      [value]="selectedCategoryId !== null ? selectedCategoryId : 'all'"
+      (selectionChange)="onCategoryChange($event.value)"
+    >
+      <mat-option value="all">Todas</mat-option>
+      @for (c of categories; track c.id) {
+        <mat-option [value]="c.id">
+          {{ c.name }}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Input de búsqueda -->
+  <mat-form-field appearance="outline" class="w-full md:flex-1">
+    <mat-label>Buscar</mat-label>
+    <input
+      matInput
+      placeholder="Nombre o marca"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchChange($event)"
+    />
+  </mat-form-field>
+</div>
+
+<!-- Estado cargando -->
+@if (loading) {
+  <p class="text-gray-500 mb-4">
+    Cargando productos...
+  </p>
+}
+
+<!-- Estado error -->
+@if (error) {
+  <p class="text-red-600 mb-4">
+    {{ error }}
+  </p>
+}
+
+<!-- Lista de productos -->
+@if (!loading && !error) {
+  <div class="grid gap-4 md:grid-cols-3">
+    @for (p of products; track p) {
+      <mat-card class="flex flex-col justify-between">
+        <mat-card-header>
+          <mat-card-title>{{ p.name }}</mat-card-title>
+          <mat-card-subtitle>{{ p.brand }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="mt-2">
+          <p class="text-lg font-semibold">$ {{ p.price }}</p>
+          <p class="text-sm" [class.text-red-600]="p.stock === 0">
+            Stock: {{ p.stock }}
+          </p>
+        </mat-card-content>
+        <mat-card-actions class="mt-4">
+          
+            <button
+              mat-stroked-button
+              color="primary"
+              (click)="addToCart(p)"
+            >
+          Agregar al carrito
+  </button>
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+}
+
+<!-- Si no hay productos y no hay error -->
+@if (!loading && !error && products.length === 0) {
+  <p class="text-gray-500">
+    No hay productos para esta categoría.
+  </p>
+}

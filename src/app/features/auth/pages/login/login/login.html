@@ -1,0 +1,44 @@
+<div class="flex justify-center items-center min-h-[60vh]">
+  <mat-card class="w-full max-w-md">
+    <h1 class="text-2xl font-bold mb-4">Iniciar sesión</h1>
+
+    <form (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+      <mat-form-field appearance="outline">
+        <mat-label>Correo</mat-label>
+        <input
+          matInput
+          type="email"
+          name="email"
+          [(ngModel)]="email"
+          required
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Contraseña</mat-label>
+          <input
+            matInput
+            type="password"
+            name="password"
+            [(ngModel)]="password"
+            required
+            />
+          </mat-form-field>
+
+          <button
+            mat-raised-button
+            color="primary"
+            [disabled]="loading"
+            class="mt-2"
+            >
+            {{ loading ? 'Entrando...' : 'Entrar' }}
+          </button>
+
+          @if (error) {
+            <p class="text-red-600 mt-2">
+              {{ error }}
+            </p>
+          }
+        </form>
+      </mat-card>
+    </div>
