@@ -6,12 +6,13 @@ import { AdminCategoriesComponent } from './features/admin/pages/admin-categorie
 import { adminGuard } from './core/guards/admin.guard';
 import { CartComponent } from './features/cart/pages/cart/cart';
 import { AdminOrdersComponent } from './features/admin/pages/admin-orders/admin-orders';
-
+import { RegisterComponent } from './features/auth/pages/register/register';
 
 export const routes: Routes = [
     {path: '', redirectTo: 'products', pathMatch: 'full' },
     {path: 'products', component : ProductsListComponent},
     {path: 'login', component: LoginComponent},
+    {path: 'register', component: RegisterComponent},
     {path:'cart',component:CartComponent},
     {
     path: 'admin',

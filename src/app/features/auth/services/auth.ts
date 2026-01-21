@@ -19,6 +19,28 @@ export class AuthService {
     }
   }
 
+  register(
+    name: string,
+    email: string,
+    password: string,
+    role?: 'customer' | 'employee' | 'admin'
+  ): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${this.apiUrl}/register`, {
+        name,
+        email,
+        password,
+        role
+      })
+      .pipe(
+        tap((res) => {
+          this.currentUser = res.user;
+          localStorage.setItem('auth_token', res.accessToken);
+          localStorage.setItem('auth_user', JSON.stringify(res.user));
+        }),
+      );
+  }
+
   login(email: string, password: string): Observable<LoginResponse> {
     return this.http
       .post<LoginResponse>(`${this.apiUrl}/login`, { email, password })
