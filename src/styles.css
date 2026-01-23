@@ -1,6 +1,21 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import "tailwindcss";
+@theme {
+  --color-bg: #070A12;
+  --color-surface: #0B1220;
+  --color-border: #1E2A44;
+  --color-primary: #1F6FEB;
+  --color-primary-hover: #2B7CFF;
+}
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+@layer base {
+  html, body { height: 100%; }
+  body { @apply bg-slate-950 text-slate-100; }
+}
+
+
+

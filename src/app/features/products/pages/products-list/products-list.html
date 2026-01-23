@@ -46,30 +46,32 @@
 
 <!-- Lista de productos -->
 @if (!loading && !error) {
-  <div class="grid gap-4 md:grid-cols-3">
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
     @for (p of products; track p) {
-      <mat-card class="flex flex-col justify-between">
-        <mat-card-header>
-          <mat-card-title>{{ p.name }}</mat-card-title>
-          <mat-card-subtitle>{{ p.brand }}</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content class="mt-2">
-          <p class="text-lg font-semibold">$ {{ p.price }}</p>
-          <p class="text-sm" [class.text-red-600]="p.stock === 0">
-            Stock: {{ p.stock }}
-          </p>
-        </mat-card-content>
-        <mat-card-actions class="mt-4">
-          
-            <button
-              mat-stroked-button
-              color="primary"
-              (click)="addToCart(p)"
-            >
-          Agregar al carrito
-  </button>
-        </mat-card-actions>
-      </mat-card>
+      <mat-card class="flex flex-col justify-between h-full bg-slate-900/60 hover:bg-slate-900/70 border border-slate-800 text-slate-100 rounded-2xl shadow-sm transition-colors">
+  <mat-card-header class="pb-0">
+    <mat-card-title class="!text-slate-100 text-base md:text-lg font-semibold">{{ p.name }}</mat-card-title>
+    <mat-card-subtitle class="text-slate-300">{{ p.brand }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content class="mt-2 flex-1">
+    <p class="text-lg font-semibold text-slate-100">$ {{ p.price }}</p>
+    <p class="text-sm text-slate-300" [class.text-red-500]="p.stock === 0" [class.text-slate-300]="p.stock !== 0">
+      Stock: {{ p.stock }}
+    </p>
+  </mat-card-content>
+
+  <mat-card-actions class="mt-4 flex justify-end pt-0">
+    <button
+      mat-stroked-button
+      color="primary"
+      class="rounded-lg border-border hover:bg-white/5 transition-colors"
+      (click)="addToCart(p)"
+    >
+      Agregar al carrito
+    </button>
+  </mat-card-actions>
+</mat-card>
     }
   </div>
 }

@@ -1,41 +1,115 @@
-<mat-toolbar ...>
-  <div class="w-full max-w-6xl mx-auto flex items-center gap-4">
-    <span class="font-semibold text-2xl md:text-3xl">ComponentsCore</span>
+
+<mat-toolbar
+  class="!bg-slate-950 !text-slate-100 border-b border-slate-800"
+>
+  <div class="w-full max-w-6xl mx-auto flex items-center gap-3 px-2">
+    <!-- Brand -->
+    <a routerLink="/"
+       class="flex items-center gap-2 select-none">
+      <span class="font-['Space_Grotesk'] font-semibold tracking-tight text-xl md:text-2xl">
+        ComponentsCore
+      </span>
+      <span class="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-300">
+        v1
+      </span>
+    </a>
+
     <span class="flex-1"></span>
 
-    <button mat-button class="md:hidden">menu</button>
+    <!-- Mobile -->
+<button
+  mat-icon-button
+  class="hidden md:!hidden"
+  [matMenuTriggerFor]="mobileMenu"
+  aria-label="Abrir menú"
+>
+  <mat-icon>menu</mat-icon>
+</button>
 
-    <nav class="hidden md:flex gap-1">
-      <a mat-button routerLink="/products"
-         class="px-2 hover:bg-slate-800 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400">
+
+<mat-menu #mobileMenu="matMenu">
+  <button mat-menu-item routerLink="/products">Productos</button>
+
+  <button mat-menu-item routerLink="/cart">
+    Carrito
+    @if (CartService.countItems() > 0) {
+      <span class="ml-2 text-xs bg-red-500 text-white rounded-full px-2 py-0.5">
+        {{ CartService.countItems() }}
+      </span>
+    }
+  </button>
+
+  @if (auth.hasRole('admin', 'employee')) {
+    <button mat-menu-item routerLink="/admin">Admin</button>
+  }
+
+  @if (!auth.isLoggedIn()) {
+    <button mat-menu-item routerLink="/login">Iniciar sesión</button>
+  } @else {
+    <button mat-menu-item (click)="auth.logout()">Cerrar sesión</button>
+  }
+</mat-menu>
+
+
+    <!-- Desktop nav -->
+    <nav class="hidden md:flex items-center gap-1">
+      <a mat-button
+         routerLink="/products"
+         routerLinkActive="bg-white/5 text-white"
+         class="rounded-lg px-3 py-1.5 text-slate-200 hover:text-white hover:bg-white/5 transition-colors
+                focus:outline-none focus:ring-2 focus:ring-primary/60">
         Productos
       </a>
-      <a mat-button routerLink="/cart"
-         class="px-2 hover:bg-slate-800 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400">
-        Carrito
-        @if (CartService.countItems() > 0) {
-          <span class="text-xs bg-red-600 text-white rounded-full px-2 ml-2 min-w-5 text-center inline-block">
-            {{ CartService.countItems() }}
-          </span>
-        }
+
+      <a mat-button
+         routerLink="/cart"
+         routerLinkActive="bg-white/5 text-white"
+         class="rounded-lg px-3 py-1.5 text-slate-200 hover:text-white hover:bg-white/5 transition-colors
+                focus:outline-none focus:ring-2 focus:ring-primary/60">
+        <span class="inline-flex items-center gap-2">
+          Carrito
+
+          @if (CartService.countItems() > 0) {
+            <span
+              class="text-[11px] leading-4 font-semibold bg-red-500/90 text-white rounded-full px-2 py-0.5
+                     min-w-5 text-center border border-white/10 shadow-sm"
+            >
+              {{ CartService.countItems() }}
+            </span>
+          }
+        </span>
       </a>
+
       @if (auth.hasRole('admin', 'employee')) {
-      <a mat-button routerLink="/admin"
-         class="px-2 hover:bg-slate-800 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400">
-        Admin
-      </a>
+        <a mat-button
+           routerLink="/admin"
+           routerLinkActive="bg-white/5 text-white"
+           class="rounded-lg px-3 py-1.5 text-slate-200 hover:text-white hover:bg-white/5 transition-colors
+                  focus:outline-none focus:ring-2 focus:ring-primary/60">
+          Admin
+        </a>
       }
     </nav>
 
-    <div class="hidden md:flex gap-2 ml-2">
+    <!-- Auth actions -->
+    <div class="hidden md:flex items-center gap-2 ml-2">
       @if (!auth.isLoggedIn()) {
-        <a mat-stroked-button routerLink="/login">Iniciar sesión</a>
+        <a mat-stroked-button
+           routerLink="/login"
+           class="rounded-lg border border-border !text-slate-100 hover:bg-white/5 transition-colors">
+          Iniciar sesión
+        </a>
       } @else {
-        <button mat-stroked-button (click)="auth.logout()">Cerrar sesión</button>
+        <button mat-stroked-button
+                (click)="auth.logout()"
+                class="rounded-lg border border-border !text-slate-100 hover:bg-white/5 transition-colors">
+          Cerrar sesión
+        </button>
       }
     </div>
   </div>
 </mat-toolbar>
-<main class="p-4">
+
+<main class="min-h-screen bg-slate-950 text-slate-100 p-4">
   <router-outlet></router-outlet>
 </main>

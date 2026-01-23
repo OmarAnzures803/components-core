@@ -15,7 +15,6 @@ import { Category } from '../../../categories/models/category.model';
 import { CategoriesService } from '../../../categories/services/categories';
 
 import { CartService } from '../../../../core/services/cart.service';
-import { catchError, finalize, of } from 'rxjs';
 
 @Component({
   selector: 'app-products-list',
@@ -25,7 +24,7 @@ import { catchError, finalize, of } from 'rxjs';
     FormsModule,
     MatCardModule,
     MatButtonModule,
-    MatFormFieldModule,   // 👈 solo el módulo
+    MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
   ],
@@ -34,14 +33,14 @@ import { catchError, finalize, of } from 'rxjs';
 })
 export class ProductsListComponent implements OnInit {
   products: Product[] = [];
-  allProducts: Product[] = [];   // aquí guardamos todo lo que viene del backend
+  allProducts: Product[] = [];
   loading = true;
 
   categories: Category[] = [];
   selectedCategoryId: number | null = null;
 
   error: string | null = null;
-  searchTerm: string = '';
+  searchTerm = '';
 
   constructor(
     private productsService: ProductsService,
@@ -51,7 +50,6 @@ export class ProductsListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Cargamos categorías y productos al arrancar
     this.loadCategories();
     this.loadProducts();
   }
@@ -66,7 +64,6 @@ export class ProductsListComponent implements OnInit {
     this.applyFilters();
   }
 
-  // Handler cuando el usuario cambia la categoría en el select
   onCategoryChange(value: string | number): void {
     if (value === 'all') {
       this.selectedCategoryId = null;
@@ -75,8 +72,6 @@ export class ProductsListComponent implements OnInit {
       this.selectedCategoryId = isNaN(id) ? null : id;
     }
 
-    // NO llamamos directamente a loadProducts con filtro si
-    // queremos filtrar en memoria. Usamos applyFilters:
     this.applyFilters();
   }
 
@@ -97,7 +92,6 @@ export class ProductsListComponent implements OnInit {
     });
   }
 
-  // Cargar categorías desde el backend
   loadCategories(): void {
     this.categoriesService.getCategories().subscribe({
       next: (cats) => {
@@ -109,29 +103,26 @@ export class ProductsListComponent implements OnInit {
     });
   }
 
-  // Cargar productos desde el backend
   loadProducts(): void {
     this.loading = true;
     this.error = null;
 
-    this.productsService
-      .getProducts()
-      .pipe(
-        catchError((err) => {
-          console.error('Error al cargar productos', err);
-          this.error = 'No se pudieron cargar los productos.';
-          this.allProducts = [];
-          this.applyFilters();
-          return of([]);
-        }),
-        finalize(() => {
-          this.loading = false;
-        }),
-      )
-      .subscribe((products) => {
-        this.allProducts = products;  // 👈 guardamos todo
-        this.applyFilters();          // 👈 aplicamos búsqueda/categoría actuales
+    this.productsService.getProducts().subscribe({
+      next: (products) => {
+        console.log('🟢 Productos cargados:', products);
+        this.allProducts = products;
+        this.applyFilters();
+        this.loading = false;  // 👈 aquí apagamos el "Cargando"
+        console.log('loading después de cargar:', this.loading);
         this.cdr.detectChanges();
-      });
+      },
+      error: (err) => {
+        console.error('❌ Error al cargar productos', err);
+        this.error = 'No se pudieron cargar los productos.';
+        this.allProducts = [];
+        this.applyFilters();
+        this.loading = false;  // 👈 también aquí
+      },
+    });
   }
 }
